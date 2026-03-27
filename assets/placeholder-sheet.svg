@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600">
+  <rect width="1200" height="1600" fill="#efe6d1"/>
+  <rect x="70" y="70" width="1060" height="1460" rx="24" fill="#f8f1e2" stroke="#97856b" stroke-width="4"/>
+  <text x="120" y="200" fill="#5b4f3f" font-size="56" font-family="Georgia, serif" font-weight="700">Ficha del libro</text>
+  <text x="120" y="270" fill="#786b58" font-size="30" font-family="Inter, Arial, sans-serif">Esta imagen queda guardada en el set,</text>
+  <text x="120" y="315" fill="#786b58" font-size="30" font-family="Inter, Arial, sans-serif">pero no se usa como portada inicial.</text>
+  <rect x="120" y="390" width="960" height="340" rx="18" fill="#e6dcc4"/>
+  <rect x="120" y="770" width="420" height="620" rx="18" fill="#e6dcc4"/>
+  <rect x="580" y="770" width="500" height="140" rx="18" fill="#e6dcc4"/>
+  <rect x="580" y="950" width="500" height="140" rx="18" fill="#e6dcc4"/>
+  <rect x="580" y="1130" width="500" height="140" rx="18" fill="#e6dcc4"/>
+</svg>

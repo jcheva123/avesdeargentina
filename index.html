@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aves de Argentina — Biblioteca visual</title>
+  <meta name="description" content="Biblioteca visual de aves de Argentina organizada por familias y especies." />
+  <base href="/avesdeargentina/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero hero--compact">
+      <div class="hero__bg"></div>
+      <div class="hero__content wrap">
+        <div>
+          <p class="eyebrow">Colección fotográfica</p>
+          <h1>Aves de Argentina</h1>
+          <p class="hero__lead">
+            Una biblioteca visual pensada para explorar familias y especies con el orden del libro Guía de Identificación AVES de ARGENTINA &amp; URUGUAY.
+          </p>
+        </div>
+
+        <div class="hero__card">
+          <div class="hero__stat">
+            <span id="familyCount">—</span>
+            <small>familias</small>
+          </div>
+          <div class="hero__stat">
+            <span id="speciesCount">—</span>
+            <small>especies</small>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap layout">
+      <aside class="sidebar card">
+        <div class="sidebar__header">
+          <h2>Familias</h2>
+          <p>Navegación principal</p>
+        </div>
+
+        <label class="searchbox">
+          <span class="searchbox__icon">⌕</span>
+          <input id="familySearchInput" type="search" placeholder="Buscar familia o ave..." autocomplete="off" />
+        </label>
+
+        <nav id="familyList" class="family-list" aria-label="Listado de familias"></nav>
+      </aside>
+
+      <section class="main-column">
+        <div class="toolbar card">
+          <div>
+            <p class="toolbar__label">Familia actual</p>
+            <h2 id="currentFamilyCommon">—</h2>
+            <p id="currentFamilyScientific" class="toolbar__scientific">—</p>
+          </div>
+          <div class="toolbar__actions">
+            <button class="btn btn--soft" id="prevSpeciesBtn">← Ave anterior</button>
+            <button class="btn btn--soft" id="nextSpeciesBtn">Ave siguiente →</button>
+          </div>
+        </div>
+
+        <section class="species-panel card">
+          <div class="section-head">
+            <div>
+              <p class="section-head__kicker">Listado</p>
+              <h3>Especies de esta familia</h3>
+            </div>
+          </div>
+          <div id="speciesList" class="species-list"></div>
+        </section>
+
+        <article class="viewer card">
+          <div class="viewer__media">
+            <img id="mainImage" src="assets/placeholder-main-1.svg" alt="Imagen principal del ave" />
+            <button id="prevPhotoBtn" class="viewer__arrow viewer__arrow--left" aria-label="Foto anterior">‹</button>
+            <button id="nextPhotoBtn" class="viewer__arrow viewer__arrow--right" aria-label="Foto siguiente">›</button>
+            <div id="slideshowBadge" class="slideshow-badge" hidden>Automático</div>
+          </div>
+
+          <div class="viewer__info">
+            <div class="viewer__top">
+              <div>
+                <p class="viewer__kicker">Ave seleccionada</p>
+                <h3 id="currentSpeciesCommon">—</h3>
+                <p id="currentSpeciesScientific" class="viewer__scientific">—</p>
+                <p id="noPhotoNotice" class="viewer__notice" hidden>Aún sin registro fotográfico.</p>
+              </div>
+
+              <div class="viewer__controls">
+                <button class="btn btn--soft btn--play" id="toggleSpeciesSlideshowBtn" type="button">
+                  ▶ Pasar automáticamente
+                </button>
+              </div>
+            </div>
+
+            <div class="viewer__meta">
+              <span id="speciesOrderBadge" class="pill">Orden —</span>
+              <span id="photoCounter" class="pill">Foto 1/1</span>
+              <span id="familyOrderBadge" class="pill pill--muted">Familia —</span>
+            </div>
+          </div>
+
+          <div class="thumbs" id="thumbStrip" aria-label="Miniaturas de la especie"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <template id="familyButtonTemplate">
+    <button class="family-item" type="button">
+      <span class="family-item__number"></span>
+      <span class="family-item__labels">
+        <strong></strong>
+        <small></small>
+      </span>
+    </button>
+  </template>
+
+  <template id="speciesCardTemplate">
+    <button class="species-card" type="button">
+      <div class="species-card__preview"></div>
+      <div class="species-card__text">
+        <span class="species-card__order"></span>
+        <strong></strong>
+        <small></small>
+      </div>
+    </button>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

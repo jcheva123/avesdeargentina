@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1D4552"/>
+      <stop offset="100%" stop-color="#7CC4D7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g)"/>
+  <circle cx="320" cy="180" r="100" fill="#ffffff24"/>
+  <path d="M460 720c60-180 200-315 382-355 149-33 315 16 458 136 82 69 142 153 180 219H460z" fill="#071018c8"/>
+  <path d="M930 410c110-48 212-35 312 40-112-7-198 17-289 86-70 53-116 121-151 217-32-145-7-244 128-343z" fill="#f6ffffb5"/>
+  <text x="100" y="860" fill="#ffffff" font-size="64" font-family="Inter, Arial, sans-serif" font-weight="700">Galería de especie</text>
+  <text x="100" y="920" fill="#e4f7fb" font-size="34" font-family="Inter, Arial, sans-serif">Pensada para público general y navegación simple</text>
+</svg>

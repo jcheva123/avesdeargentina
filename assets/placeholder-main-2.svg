@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5A4C78"/>
+      <stop offset="100%" stop-color="#D8B86E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g)"/>
+  <path d="M180 740c85-160 230-260 390-280 132-17 255 18 360 97 72 55 112 109 170 228H180z" fill="#0a1118bb"/>
+  <path d="M790 420c95-44 191-39 292 15-105 5-176 30-252 92-54 44-85 96-105 171-30-120-15-204 65-278z" fill="#ffffffa8"/>
+  <text x="100" y="860" fill="#ffffff" font-size="64" font-family="Inter, Arial, sans-serif" font-weight="700">Fotografía secundaria</text>
+  <text x="100" y="920" fill="#f6f1df" font-size="34" font-family="Inter, Arial, sans-serif">Ideal para probar el carrusel y miniaturas</text>
+</svg>
