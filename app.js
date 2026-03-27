@@ -1,4 +1,4 @@
-const BASE_PATH = '/avesdeargentina';
+const BASE_PATH = '/';
 const MANIFEST_URL = `${BASE_PATH}/data/manifest.json`;
 
 const PLACEHOLDER_MAIN_1 = `${BASE_PATH}/assets/placeholder-main-1.svg`;
