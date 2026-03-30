@@ -2,7 +2,7 @@
 
 Este boceto está pensado para convertirse en una subpágina estática, por ejemplo:
 
-`https://primateled.pages.dev/avesdeargentina`
+`https://avesdeargentina`
 
 ## Qué resuelve este prototipo
 
