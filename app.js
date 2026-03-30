@@ -4,6 +4,7 @@ const MANIFEST_URL = `${BASE_PATH}/data/manifest.json`;
 const PLACEHOLDER_MAIN_1 = `${BASE_PATH}/assets/placeholder-main-1.svg`;
 const PLACEHOLDER_MAIN_2 = `${BASE_PATH}/assets/placeholder-main-2.svg`;
 const PLACEHOLDER_MAIN_3 = `${BASE_PATH}/assets/placeholder-main-3.svg`;
+const FAMILY_FALLBACK_THUMB = `${BASE_PATH}/assets/placeholder-main-3.svg`;
 
 const SLIDESHOW_MS = 8000;
 
@@ -15,9 +16,14 @@ const state = {
   currentPhotoIndex: 0,
   slideshowTimer: null,
   slideshowActive: false,
+  sidebarCollapsed: false,
+  showSpeciesWithoutPhotos: false,
 };
 
 const els = {
+  layoutRoot: document.getElementById('layoutRoot'),
+  sidebar: document.getElementById('sidebar'),
+  toggleSidebarBtn: document.getElementById('toggleSidebarBtn'),
   familyList: document.getElementById('familyList'),
   familySearchInput: document.getElementById('familySearchInput'),
   currentFamilyCommon: document.getElementById('currentFamilyCommon'),
@@ -35,6 +41,8 @@ const els = {
   speciesOrderBadge: document.getElementById('speciesOrderBadge'),
   familyOrderBadge: document.getElementById('familyOrderBadge'),
   toggleSpeciesSlideshowBtn: document.getElementById('toggleSpeciesSlideshowBtn'),
+  toggleNoPhotoSpeciesBtn: document.getElementById('toggleNoPhotoSpeciesBtn'),
+  fullscreenBtn: document.getElementById('fullscreenBtn'),
   prevSpeciesBtn: document.getElementById('prevSpeciesBtn'),
   nextSpeciesBtn: document.getElementById('nextSpeciesBtn'),
   prevPhotoBtn: document.getElementById('prevPhotoBtn'),
@@ -59,6 +67,9 @@ async function init() {
     state.filteredFamilies = [...state.data.families];
 
     updateCounters();
+    updateSidebarState();
+    updateSpeciesFilterButton();
+    updateFullscreenButton();
     renderFamilies();
     renderCurrentView();
   } catch (error) {
@@ -71,12 +82,22 @@ function bindEvents() {
   els.familySearchInput?.addEventListener('input', handleFamilySearch);
 
   els.toggleSpeciesSlideshowBtn?.addEventListener('click', () => {
-    if (state.slideshowActive) {
-      stopSlideshow();
-    } else {
-      startSlideshow();
-    }
+    if (state.slideshowActive) stopSlideshow();
+    else startSlideshow();
   });
+
+  els.toggleNoPhotoSpeciesBtn?.addEventListener('click', () => {
+    state.showSpeciesWithoutPhotos = !state.showSpeciesWithoutPhotos;
+    updateSpeciesFilterButton();
+    ensureCurrentSpeciesIsVisible();
+    renderSpeciesCards(getCurrentFamily());
+    renderCurrentView();
+  });
+
+els.toggleSidebarBtn?.addEventListener('click', toggleSidebar);
+
+  els.fullscreenBtn?.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', updateFullscreenButton);
 
   els.prevSpeciesBtn?.addEventListener('click', () => {
     stopSlideshow();
@@ -134,6 +155,7 @@ function normalizeManifest(raw) {
                 : normalizedAllImages.filter(photo => !photo.isReferenceSheet);
 
           const hasPhotos = species.hasPhotos ?? displayPhotos.length > 0;
+          const firstDisplayPhoto = displayPhotos[0]?.renderUrl || coverImage?.renderUrl || '';
 
           return {
             ...species,
@@ -145,12 +167,17 @@ function normalizeManifest(raw) {
             photos: displayPhotos,
             allImages: normalizedAllImages,
             displayPhotos,
-            firstDisplayPhoto: displayPhotos[0]?.renderUrl || coverImage?.renderUrl || '',
+            firstDisplayPhoto,
             hasPhotos,
             noPhotoMessage: species.noPhotoMessage || 'Aún sin registro fotográfico',
           };
         })
         .sort((a, b) => a.order - b.order);
+
+      const thumbnailUrl =
+        family.thumbnailUrl ||
+        species.find(sp => sp.hasPhotos && sp.firstDisplayPhoto)?.firstDisplayPhoto ||
+        '';
 
       return {
         ...family,
@@ -158,6 +185,7 @@ function normalizeManifest(raw) {
         commonName: (family.commonName || parsedFamily.commonName || 'FAMILIA').toUpperCase(),
         scientificName: family.scientificName || parsedFamily.scientificName || '',
         species,
+        thumbnailUrl,
       };
     })
     .sort((a, b) => a.order - b.order);
@@ -188,7 +216,7 @@ function getRenderableImageUrl(photo) {
 
   if (!id) return '';
 
-  return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w2000`;
+  return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1200`;
 }
 
 function extractDriveId(url = '') {
@@ -286,6 +314,31 @@ function getCurrentSpecies() {
   return family?.species[state.currentSpeciesIndex] || null;
 }
 
+function getVisibleSpecies(family) {
+  if (!family) return [];
+  if (state.showSpeciesWithoutPhotos) return family.species;
+  return family.species.filter(species => species.hasPhotos);
+}
+
+function ensureCurrentSpeciesIsVisible() {
+  const family = getCurrentFamily();
+  if (!family) return;
+
+  const visibleSpecies = getVisibleSpecies(family);
+
+  if (!visibleSpecies.length) {
+    state.currentSpeciesIndex = 0;
+    return;
+  }
+
+  const current = family.species[state.currentSpeciesIndex];
+  if (current && (state.showSpeciesWithoutPhotos || current.hasPhotos)) return;
+
+  const firstVisible = visibleSpecies[0];
+  const nextIndex = family.species.findIndex(sp => sp === firstVisible);
+  state.currentSpeciesIndex = nextIndex >= 0 ? nextIndex : 0;
+}
+
 function renderFamilies() {
   if (!els.familyList) return;
 
@@ -300,9 +353,24 @@ function renderFamilies() {
   state.filteredFamilies.forEach((family, index) => {
     const node = tpl.content.firstElementChild.cloneNode(true);
 
-    node.querySelector('.family-item__number').textContent = family.order;
-    node.querySelector('strong').textContent = family.commonName;
-    node.querySelector('small').textContent = family.scientificName;
+    const num = node.querySelector('.family-item__number');
+    const strong = node.querySelector('strong');
+    const small = node.querySelector('small');
+    const thumb = node.querySelector('.family-item__thumb');
+
+    num.textContent = family.order;
+    strong.textContent = family.commonName;
+    small.textContent = family.scientificName;
+
+    const manualThumb = `${BASE_PATH}/assets/familias/${family.order}.jpg`;
+    const autoThumb = family.thumbnailUrl || FAMILY_FALLBACK_THUMB;
+
+    thumb.src = manualThumb;
+    thumb.alt = '';
+    thumb.onerror = function () {
+      this.onerror = null;
+      this.src = autoThumb || FAMILY_FALLBACK_THUMB;
+    };
 
     node.classList.toggle('is-active', index === state.currentFamilyIndex);
 
@@ -311,6 +379,7 @@ function renderFamilies() {
       state.currentFamilyIndex = index;
       state.currentSpeciesIndex = 0;
       state.currentPhotoIndex = 0;
+      ensureCurrentSpeciesIsVisible();
       renderFamilies();
       renderCurrentView();
     });
@@ -320,6 +389,8 @@ function renderFamilies() {
 }
 
 function renderCurrentView() {
+  ensureCurrentSpeciesIsVisible();
+
   const family = getCurrentFamily();
   const species = getCurrentSpecies();
 
@@ -362,9 +433,7 @@ function renderMainImage(species) {
     return;
   }
 
-  if (els.mainImage) {
-    els.mainImage.style.display = '';
-  }
+  if (els.mainImage) els.mainImage.style.display = '';
   if (els.prevPhotoBtn) els.prevPhotoBtn.hidden = false;
   if (els.nextPhotoBtn) els.nextPhotoBtn.hidden = false;
 
@@ -422,6 +491,7 @@ function renderThumbnails(species) {
     els.thumbStrip.appendChild(button);
   });
 }
+
 function scrollToViewer() {
   if (!els.viewerCard) return;
 
@@ -432,13 +502,21 @@ function scrollToViewer() {
     });
   });
 }
+
 function renderSpeciesCards(family) {
   if (!els.speciesList) return;
 
   els.speciesList.innerHTML = '';
   const tpl = document.getElementById('speciesCardTemplate');
+  const visibleSpecies = getVisibleSpecies(family);
 
-  family.species.forEach((species, index) => {
+  if (!visibleSpecies.length) {
+    els.speciesList.innerHTML = '<div class="empty-state">No hay especies visibles con este filtro.</div>';
+    return;
+  }
+
+  visibleSpecies.forEach((species) => {
+    const index = family.species.findIndex(sp => sp === species);
     const node = tpl.content.firstElementChild.cloneNode(true);
 
     node.querySelector('.species-card__order').textContent = `N° ${species.order}`;
@@ -457,13 +535,13 @@ function renderSpeciesCards(family) {
 
     node.classList.toggle('is-active', index === state.currentSpeciesIndex);
 
-node.addEventListener('click', () => {
-  stopSlideshow();
-  state.currentSpeciesIndex = index;
-  state.currentPhotoIndex = 0;
-  renderCurrentView();
-  scrollToViewer();
-});
+    node.addEventListener('click', () => {
+      stopSlideshow();
+      state.currentSpeciesIndex = index;
+      state.currentPhotoIndex = 0;
+      renderCurrentView();
+      scrollToViewer();
+    });
 
     els.speciesList.appendChild(node);
   });
@@ -473,20 +551,37 @@ function moveSpecies(step) {
   const family = getCurrentFamily();
   if (!family) return;
 
-  const nextIndex = state.currentSpeciesIndex + step;
+  const visibleSpecies = getVisibleSpecies(family);
+  if (!visibleSpecies.length) return;
 
-  if (nextIndex >= 0 && nextIndex < family.species.length) {
-    state.currentSpeciesIndex = nextIndex;
+  const currentSpecies = family.species[state.currentSpeciesIndex];
+  let visibleIndex = visibleSpecies.findIndex(sp => sp === currentSpecies);
+  if (visibleIndex === -1) visibleIndex = 0;
+
+  const nextVisibleIndex = visibleIndex + step;
+
+  if (nextVisibleIndex >= 0 && nextVisibleIndex < visibleSpecies.length) {
+    const nextSpecies = visibleSpecies[nextVisibleIndex];
+    state.currentSpeciesIndex = family.species.findIndex(sp => sp === nextSpecies);
     state.currentPhotoIndex = 0;
     renderCurrentView();
     return;
   }
 
   const nextFamilyIndex = state.currentFamilyIndex + step;
-
   if (nextFamilyIndex >= 0 && nextFamilyIndex < state.filteredFamilies.length) {
     state.currentFamilyIndex = nextFamilyIndex;
-    state.currentSpeciesIndex = step > 0 ? 0 : state.filteredFamilies[nextFamilyIndex].species.length - 1;
+
+    const nextFamily = state.filteredFamilies[nextFamilyIndex];
+    const nextVisible = getVisibleSpecies(nextFamily);
+
+    if (!nextVisible.length) {
+      state.currentSpeciesIndex = 0;
+    } else {
+      const targetSpecies = step > 0 ? nextVisible[0] : nextVisible[nextVisible.length - 1];
+      state.currentSpeciesIndex = nextFamily.species.findIndex(sp => sp === targetSpecies);
+    }
+
     state.currentPhotoIndex = 0;
     renderFamilies();
     renderCurrentView();
@@ -563,9 +658,53 @@ function stopSlideshow(refreshButton = true) {
     state.slideshowTimer = null;
   }
 
-  if (refreshButton) {
-    updateSlideshowButtonState(getCurrentSpecies());
+  if (refreshButton) updateSlideshowButtonState(getCurrentSpecies());
+}
+
+function toggleSidebar() {
+  state.sidebarCollapsed = !state.sidebarCollapsed;
+  updateSidebarState();
+}
+
+function updateSidebarState() {
+  if (!els.layoutRoot || !els.sidebar) return;
+
+  els.layoutRoot.classList.toggle('layout--sidebar-compact', state.sidebarCollapsed);
+  els.sidebar.classList.toggle('sidebar--compact', state.sidebarCollapsed);
+
+  if (els.toggleSidebarBtn) {
+    els.toggleSidebarBtn.textContent = '☰';
+    els.toggleSidebarBtn.title = state.sidebarCollapsed
+      ? 'Mostrar listado de familias'
+      : 'Ocultar listado de familias';
   }
+}
+
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (error) {
+    console.warn('No se pudo cambiar a pantalla completa:', error);
+  }
+}
+
+function updateFullscreenButton() {
+  if (!els.fullscreenBtn) return;
+  els.fullscreenBtn.textContent = document.fullscreenElement
+    ? '🡼 Salir de pantalla completa'
+    : '⛶ Pantalla completa';
+}
+
+function updateSpeciesFilterButton() {
+  if (!els.toggleNoPhotoSpeciesBtn) return;
+
+  els.toggleNoPhotoSpeciesBtn.textContent = state.showSpeciesWithoutPhotos
+    ? 'Ocultar especies sin foto'
+    : 'Mostrar todas las especies';
 }
 
 function clampIndex(index, length) {
