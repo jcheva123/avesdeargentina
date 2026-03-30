@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Más info y contacto — Aves de Argentina</title>
+  <meta name="description" content="Información sobre los autores de la colección fotográfica Aves de Argentina." />
+  <base href="/avesdeargentina/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .info-page {
+      padding: 28px 0 40px;
+    }
+
+    .info-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .info-topbar__title {
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.02;
+    }
+
+    .info-card {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+      gap: 24px;
+      align-items: center;
+    }
+
+    .info-card__media {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .info-card__media img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .info-card__content h2 {
+      margin: 0 0 14px;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      line-height: 1.03;
+    }
+
+    .info-card__content p {
+      margin: 0 0 14px;
+      color: #d7e1ec;
+      line-height: 1.72;
+      font-size: 1rem;
+    }
+
+    .info-contact {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .info-contact__mail {
+      color: var(--accent-2);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .info-contact__mail:hover {
+      text-decoration: underline;
+    }
+
+    .info-footnote {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .info-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="wrap info-page">
+      <div class="info-topbar">
+        <div>
+          <p class="section-head__kicker">Más info</p>
+          <h1 class="info-topbar__title">Sobre esta colección</h1>
+        </div>
+
+        <a class="btn btn--soft" href="index.html">← Volver al inicio</a>
+      </div>
+
+      <section class="info-card card">
+        <div class="info-card__media">
+          <img src="assets/Martayhector.JPG" alt="Héctor Chevalier y Marta S. García" />
+        </div>
+
+        <div class="info-card__content">
+          <h2>Una vida de observación, viajes y naturaleza</h2>
+
+          <p>
+            Esta recopilación fotográfica ha sido realizada con mucho empeño, dedicación y amor por la naturaleza
+            por <strong>Héctor Chevalier</strong> y <strong>Marta S. García</strong>.
+          </p>
+
+          <p>
+            Desde <strong>Bahía Blanca</strong>, recorriendo en su extensión la República Argentina, fueron construyendo esta colección con una mirada paciente, sensible y profundamente
+            respetuosa del entorno natural.
+          </p>
+
+          <p>
+            Este trabajo detallado y minucioso es el resultado de <strong>más de 30 años</strong> de observación,
+            registro, viajes y organización, representa no solo un valioso archivo fotográfico, sino también una
+            forma de amor por las aves, los paisajes y la biodiversidad de nuestro país.
+          </p>
+
+          <div class="info-contact">
+            <span class="pill pill--muted">Contacto</span>
+            <a class="info-contact__mail" href="mailto:chevaliermarta@gmail.com">
+              chevaliermarta@gmail.com
+            </a>
+          </div>
+
+          <p class="info-footnote">
+            Esta biblioteca visual busca dar forma y difusión a ese enorme trabajo de recopilación, para que pueda
+            ser apreciado y recorrido de manera clara, ordenada y accesible.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
