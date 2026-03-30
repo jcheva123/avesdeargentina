@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aves de Argentina — Biblioteca visual</title>
   <meta name="description" content="Biblioteca visual de aves de Argentina organizada por familias y especies." />
-  <base href="/">
+  <base href="/avesdeargentina/">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,32 +20,31 @@
         <div>
           <p class="eyebrow">Colección fotográfica</p>
           <h1>Aves de Argentina</h1>
-          <p class="hero__lead">
-            Una biblioteca visual pensada para explorar familias y especies con el orden del libro Guía de Identificación AVES de ARGENTINA &amp; URUGUAY.
-          </p>
+<p class="hero__lead">
+  Una biblioteca visual pensada para explorar familias y especies con el orden del libro Guía de Identificación AVES de ARGENTINA &amp; URUGUAY. Una colección de 47 familias con un total de 1080 especies.
+</p>
         </div>
 
-        <div class="hero__card">
-          <div class="hero__stat">
-            <span id="familyCount">—</span>
-            <small>familias</small>
-          </div>
-          <div class="hero__stat">
-            <span id="speciesCount">—</span>
-            <small>especies</small>
-          </div>
+<div class="hero__card hero__card--buttons">
+  <button class="btn btn--soft hero__fullscreenBtn" id="fullscreenBtn" type="button">
+    ⛶ Pantalla completa
+  </button>
 
-        </div>
+  <a class="btn btn--soft hero__infoBtn" href="mas-info.html">
+  Info + contacto
+  </a>
+</div>
       </div>
     </header>
 
-    <main class="wrap layout">
-      <aside class="sidebar card">
-        <div class="sidebar__header">
-          <h2>Familias</h2>
-          <p>Navegación principal</p>
-        </div>
-
+    <main class="wrap layout" id="layoutRoot">
+      <aside class="sidebar card" id="sidebar">
+      <div class="sidebar__header">
+  <h2>Familias</h2>
+  <button class="btn btn--soft btn--icon" id="toggleSidebarBtn" type="button" title="Mostrar u ocultar listado de familias">
+    ☰
+  </button>
+</div>
         <label class="searchbox">
           <span class="searchbox__icon">⌕</span>
           <input id="familySearchInput" type="search" placeholder="Buscar familia o ave..." autocomplete="off" />
@@ -61,10 +60,6 @@
             <h2 id="currentFamilyCommon">—</h2>
             <p id="currentFamilyScientific" class="toolbar__scientific">—</p>
           </div>
-          <div class="toolbar__actions">
-            <button class="btn btn--soft" id="prevSpeciesBtn">← Ave anterior</button>
-            <button class="btn btn--soft" id="nextSpeciesBtn">Ave siguiente →</button>
-          </div>
         </div>
 
         <section class="species-panel card">
@@ -73,7 +68,18 @@
               <p class="section-head__kicker">Listado</p>
               <h3>Especies de esta familia</h3>
             </div>
+
+            <div class="section-head__actions">
+              <button class="btn btn--soft" id="toggleNoPhotoSpeciesBtn" type="button">
+                Mostrar todas las especies
+              </button>
+            </div>
           </div>
+
+          <p class="section-head__hint">
+            Por defecto se muestran primero las especies con registro fotográfico.
+          </p>
+
           <div id="speciesList" class="species-list"></div>
         </section>
 
@@ -95,9 +101,11 @@
               </div>
 
               <div class="viewer__controls">
+                <button class="btn btn--soft" id="prevSpeciesBtn" type="button">← Ave anterior</button>
                 <button class="btn btn--soft btn--play" id="toggleSpeciesSlideshowBtn" type="button">
                   ▶ Pasar automáticamente
                 </button>
+                <button class="btn btn--soft" id="nextSpeciesBtn" type="button">Ave siguiente →</button>
               </div>
             </div>
 
@@ -116,7 +124,10 @@
 
   <template id="familyButtonTemplate">
     <button class="family-item" type="button">
-      <span class="family-item__number"></span>
+      <span class="family-item__thumbWrap">
+        <img class="family-item__thumb" alt="" loading="lazy" />
+        <span class="family-item__number"></span>
+      </span>
       <span class="family-item__labels">
         <strong></strong>
         <small></small>
