@@ -127,10 +127,6 @@ function normalizeManifest(raw) {
 
       const species = (family.species || [])
         .map((species, speciesIndex) => {
-          // NUEVA COMPATIBILIDAD:
-          // Si el manifest viene con `images`, usamos:
-          // images[0] = ficha/scan
-          // images[1...] = fotos reales
           const rawImages =
             species.allImages ||
             species.photos ||
@@ -141,6 +137,7 @@ function normalizeManifest(raw) {
             .map((photo, photoIndex) => normalizePhoto(photo, photoIndex))
             .sort((a, b) => a.order - b.order);
 
+          // La primera imagen siempre se considera ficha / scan
           const introImage =
             species.introImage
               ? normalizePhoto(species.introImage, 0, true)
@@ -148,7 +145,8 @@ function normalizeManifest(raw) {
                 ? { ...normalizedImages[0], isReferenceSheet: true }
                 : null;
 
-          const realPhotosFromImages =
+          // Las fotos reales arrancan desde la segunda imagen
+          const realPhotos =
             normalizedImages.length > 1
               ? normalizedImages.slice(1).map(photo => ({ ...photo, isReferenceSheet: false }))
               : [];
@@ -156,39 +154,48 @@ function normalizeManifest(raw) {
           const coverImage =
             species.coverImage
               ? normalizePhoto(species.coverImage, 0, false)
-              : realPhotosFromImages[0] || null;
+              : realPhotos[0] || null;
 
           const displayPhotos =
-            (species.photos && species.photos.length
-              ? species.photos.map((photo, photoIndex) => normalizePhoto(photo, photoIndex))
-              : realPhotosFromImages
-            ).sort((a, b) => a.order - b.order);
+            realPhotos.length > 0
+              ? realPhotos
+              : (species.photos || []).map((photo, photoIndex) => normalizePhoto(photo, photoIndex));
 
-          // IMPORTANTE:
-          // el nombre sale de la primera foto real (segunda imagen total)
+          // SIEMPRE nombrar desde la primera foto real
           const namingSource =
-            coverImage?.name ||
             displayPhotos[0]?.name ||
+            coverImage?.name ||
             species.coverImage?.name ||
-            species.commonName ||
-            species.introImage?.name ||
+            species.rawName ||
+            species.filePattern ||
             '';
 
           const parsedSpecies = parseSpeciesName(namingSource);
 
+          const resolvedCommonName =
+            parsedSpecies.commonName ||
+            species.commonName ||
+            'AVE SIN NOMBRE';
+
+          const resolvedScientificName =
+            parsedSpecies.scientificName ||
+            species.scientificName ||
+            'Nombre científico no definido';
+
           const hasPhotos = species.hasPhotos ?? displayPhotos.length > 0;
+          const firstDisplayPhoto = displayPhotos[0]?.renderUrl || coverImage?.renderUrl || '';
 
           return {
             ...species,
             order: species.order ?? speciesIndex + 1,
-            commonName: (species.commonName || parsedSpecies.commonName || 'AVE SIN NOMBRE').toUpperCase(),
-            scientificName: species.scientificName || parsedSpecies.scientificName || 'Nombre científico no definido',
+            commonName: resolvedCommonName.toUpperCase(),
+            scientificName: resolvedScientificName.toLowerCase(),
             introImage,
             coverImage,
             photos: displayPhotos,
             allImages: normalizedImages,
             displayPhotos,
-            firstDisplayPhoto: displayPhotos[0]?.renderUrl || coverImage?.renderUrl || '',
+            firstDisplayPhoto,
             hasPhotos,
             noPhotoMessage: species.noPhotoMessage || 'Aún sin registro fotográfico',
           };
@@ -278,23 +285,39 @@ function parseFolderName(folderName = '') {
 }
 
 function parseSpeciesName(rawName = '') {
-  const noExt = String(rawName).replace(/\.[a-z0-9]+$/i, '').trim();
+  const noExt = String(rawName)
+    .replace(/\.[a-z0-9]+$/i, '')
+    .trim();
+
   const withoutPrefix = noExt.includes('-')
     ? noExt.split('-').slice(1).join('-').trim()
     : noExt;
 
-  const tokens = withoutPrefix.split(/\s+/).filter(Boolean);
-  if (!tokens.length) {
+  const cleaned = withoutPrefix.replace(/\s+/g, ' ').trim();
+  if (!cleaned) {
     return { commonName: '', scientificName: '' };
   }
 
-  let scientificStart = tokens.findIndex(token => /[a-záéíóúüñ]/.test(token));
-  if (scientificStart === -1) scientificStart = tokens.length;
+  // Busca al final un nombre científico de 2 o 3 palabras
+  // Ejemplos:
+  // "ZORZAL SABIA Turdus leucomelas"
+  // "JOTE CABEZA COLORADA cathartes aura falklandicus"
+  const sciMatch = cleaned.match(/([A-ZÁÉÍÓÚÜÑ]?[a-záéíóúüñ-]+(?:\s+[a-záéíóúüñ-]+){1,2})$/);
 
-  const commonName = tokens.slice(0, scientificStart).join(' ').trim().toUpperCase();
-  const scientificName = tokens.slice(scientificStart).join(' ').trim();
+  if (!sciMatch) {
+    return {
+      commonName: cleaned.toUpperCase(),
+      scientificName: '',
+    };
+  }
 
-  return { commonName, scientificName };
+  const scientificName = sciMatch[1].toLowerCase();
+  const commonPart = cleaned.slice(0, sciMatch.index).trim();
+
+  return {
+    commonName: commonPart ? commonPart.toUpperCase() : '',
+    scientificName,
+  };
 }
 
 function updateCounters() {
