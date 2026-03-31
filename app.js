@@ -145,21 +145,20 @@ function normalizeManifest(raw) {
                 ? { ...normalizedImages[0], isReferenceSheet: true }
                 : null;
 
-          // Las fotos reales arrancan desde la segunda imagen
-          const realPhotos =
-            normalizedImages.length > 1
-              ? normalizedImages.slice(1).map(photo => ({ ...photo, isReferenceSheet: false }))
-              : [];
+  const candidatePhotos =
+  normalizedImages.length > 1
+    ? normalizedImages.slice(1).map(photo => ({ ...photo, isReferenceSheet: false }))
+    : [];
 
-          const coverImage =
-            species.coverImage
-              ? normalizePhoto(species.coverImage, 0, false)
-              : realPhotos[0] || null;
+// Solo mostrar imágenes cuyo nombre de archivo tenga nombre común en mayúsculas
+const realPhotos = candidatePhotos.filter(photo => hasDisplayableCommonName(photo.name));
 
-          const displayPhotos =
-            realPhotos.length > 0
-              ? realPhotos
-              : (species.photos || []).map((photo, photoIndex) => normalizePhoto(photo, photoIndex));
+const coverImage =
+  species.coverImage
+    ? normalizePhoto(species.coverImage, 0, false)
+    : realPhotos[0] || null;
+
+const displayPhotos = realPhotos;
 
           // SIEMPRE nombrar desde la primera foto real
           const namingSource =
@@ -319,7 +318,10 @@ function parseSpeciesName(rawName = '') {
     scientificName,
   };
 }
-
+function hasDisplayableCommonName(filename = '') {
+  const parsed = parseSpeciesName(filename);
+  return Boolean(parsed.commonName && parsed.commonName.trim().length > 0);
+}
 function updateCounters() {
   if (!state.data) return;
 
