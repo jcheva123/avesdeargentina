@@ -127,35 +127,56 @@ function normalizeManifest(raw) {
 
       const species = (family.species || [])
         .map((species, speciesIndex) => {
-          const parsedSpecies = parseSpeciesName(
-            species.filePattern ||
-            species.rawName ||
-            species.commonName ||
-            species.coverImage?.name ||
-            species.introImage?.name ||
-            ''
-          );
+          // NUEVA COMPATIBILIDAD:
+          // Si el manifest viene con `images`, usamos:
+          // images[0] = ficha/scan
+          // images[1...] = fotos reales
+          const rawImages =
+            species.allImages ||
+            species.photos ||
+            species.images ||
+            [];
 
-          const normalizedAllImages = (species.allImages || species.photos || [])
+          const normalizedImages = rawImages
             .map((photo, photoIndex) => normalizePhoto(photo, photoIndex))
             .sort((a, b) => a.order - b.order);
 
-          const normalizedDisplayPhotos = (species.photos || [])
-            .map((photo, photoIndex) => normalizePhoto(photo, photoIndex))
-            .sort((a, b) => a.order - b.order);
+          const introImage =
+            species.introImage
+              ? normalizePhoto(species.introImage, 0, true)
+              : normalizedImages.length
+                ? { ...normalizedImages[0], isReferenceSheet: true }
+                : null;
 
-          const introImage = species.introImage ? normalizePhoto(species.introImage, 0, true) : null;
-          const coverImage = species.coverImage ? normalizePhoto(species.coverImage, 0, false) : null;
+          const realPhotosFromImages =
+            normalizedImages.length > 1
+              ? normalizedImages.slice(1).map(photo => ({ ...photo, isReferenceSheet: false }))
+              : [];
+
+          const coverImage =
+            species.coverImage
+              ? normalizePhoto(species.coverImage, 0, false)
+              : realPhotosFromImages[0] || null;
 
           const displayPhotos =
-            normalizedDisplayPhotos.length > 0
-              ? normalizedDisplayPhotos
-              : coverImage
-                ? [coverImage]
-                : normalizedAllImages.filter(photo => !photo.isReferenceSheet);
+            (species.photos && species.photos.length
+              ? species.photos.map((photo, photoIndex) => normalizePhoto(photo, photoIndex))
+              : realPhotosFromImages
+            ).sort((a, b) => a.order - b.order);
+
+          // IMPORTANTE:
+          // el nombre sale de la primera foto real (segunda imagen total)
+          const namingSource =
+            coverImage?.name ||
+            displayPhotos[0]?.name ||
+            species.coverImage?.name ||
+            species.commonName ||
+            species.introImage?.name ||
+            '';
+
+          const parsedSpecies = parseSpeciesName(namingSource);
 
           const hasPhotos = species.hasPhotos ?? displayPhotos.length > 0;
-          const firstDisplayPhoto = displayPhotos[0]?.renderUrl || coverImage?.renderUrl || '';
 
           return {
             ...species,
@@ -165,14 +186,20 @@ function normalizeManifest(raw) {
             introImage,
             coverImage,
             photos: displayPhotos,
-            allImages: normalizedAllImages,
+            allImages: normalizedImages,
             displayPhotos,
-            firstDisplayPhoto,
+            firstDisplayPhoto: displayPhotos[0]?.renderUrl || coverImage?.renderUrl || '',
             hasPhotos,
             noPhotoMessage: species.noPhotoMessage || 'Aún sin registro fotográfico',
           };
         })
-        .sort((a, b) => a.order - b.order);
+        .sort((a, b) => {
+          if (a.order !== b.order) return a.order - b.order;
+
+          const codeA = String(a.code || '').toLowerCase();
+          const codeB = String(b.code || '').toLowerCase();
+          return codeA.localeCompare(codeB, 'es', { numeric: true, sensitivity: 'base' });
+        });
 
       const thumbnailUrl =
         family.thumbnailUrl ||
