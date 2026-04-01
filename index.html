@@ -85,20 +85,20 @@
         </section>
 
         <article class="viewer card">
-          <div class="viewer__media">
-            <img id="mainImage" src="assets/placeholder-main-1.svg" alt="Imagen principal del ave" />
-            <button id="prevPhotoBtn" class="viewer__arrow viewer__arrow--left" aria-label="Foto anterior">‹</button>
-            <button id="nextPhotoBtn" class="viewer__arrow viewer__arrow--right" aria-label="Foto siguiente">›</button>
-            <div id="slideshowBadge" class="slideshow-badge" hidden>Automático</div>
+          <div class="viewer__info">
+            <p class="viewer__kicker">Ave seleccionada</p>
+            <h3 id="currentSpeciesCommon">—</h3>
+            <p id="currentSpeciesScientific" class="viewer__scientific">—</p>
+            <p id="noPhotoNotice" class="viewer__notice" hidden>Aún sin registro fotográfico.</p>
           </div>
 
-          <div class="viewer__info">
-            <div class="viewer__top">
-              <div>
-                <p class="viewer__kicker">Ave seleccionada</p>
-                <h3 id="currentSpeciesCommon">—</h3>
-                <p id="currentSpeciesScientific" class="viewer__scientific">—</p>
-                <p id="noPhotoNotice" class="viewer__notice" hidden>Aún sin registro fotográfico.</p>
+          <div class="viewer__content">
+            <div class="viewer__main">
+              <div class="viewer__media">
+                <img id="mainImage" src="assets/placeholder-main-1.svg" alt="Imagen principal del ave" />
+                <button id="prevPhotoBtn" class="viewer__arrow viewer__arrow--left" aria-label="Foto anterior">‹</button>
+                <button id="nextPhotoBtn" class="viewer__arrow viewer__arrow--right" aria-label="Foto siguiente">›</button>
+                <div id="slideshowBadge" class="slideshow-badge" hidden>Automático</div>
               </div>
 
               <div class="viewer__actions">
@@ -110,27 +110,29 @@
                   <button class="btn btn--soft" id="nextSpeciesBtn" type="button">Ave siguiente →</button>
                 </div>
 
-                <div class="viewer__zoom" aria-label="Tamaño del visor seleccionado">
-                  <span class="viewer__zoomLabelText">Tamaño</span>
-                  <div class="viewer__zoomControls">
-                    <button class="btn btn--soft btn--icon" id="viewerZoomOutBtn" type="button" aria-label="Reducir tamaño del visor">−</button>
-                    <button class="btn btn--soft viewer__zoomReset" id="viewerZoomResetBtn" type="button" aria-label="Restablecer tamaño del visor">
-                      <span id="viewerZoomLabel">100%</span>
-                    </button>
-                    <button class="btn btn--soft btn--icon" id="viewerZoomInBtn" type="button" aria-label="Aumentar tamaño del visor">+</button>
+                <div class="viewer__auxRow">
+                  <div class="viewer__zoom" aria-label="Tamaño del visor seleccionado">
+                    <span class="viewer__zoomLabelText">Tamaño</span>
+                    <div class="viewer__zoomControls">
+                      <button class="btn btn--soft btn--icon" id="viewerZoomOutBtn" type="button" aria-label="Reducir tamaño del visor">−</button>
+                      <button class="btn btn--soft viewer__zoomReset" id="viewerZoomResetBtn" type="button" aria-label="Restablecer tamaño del visor">
+                        <span id="viewerZoomLabel">100%</span>
+                      </button>
+                      <button class="btn btn--soft btn--icon" id="viewerZoomInBtn" type="button" aria-label="Aumentar tamaño del visor">+</button>
+                    </div>
+                  </div>
+
+                  <div class="viewer__meta">
+                    <span id="speciesOrderBadge" class="pill">Orden —</span>
+                    <span id="photoCounter" class="pill">Foto 1/1</span>
+                    <span id="familyOrderBadge" class="pill pill--muted">Familia —</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="viewer__meta">
-              <span id="speciesOrderBadge" class="pill">Orden —</span>
-              <span id="photoCounter" class="pill">Foto 1/1</span>
-              <span id="familyOrderBadge" class="pill pill--muted">Familia —</span>
-            </div>
+            <div class="thumbs" id="thumbStrip" aria-label="Miniaturas de la especie"></div>
           </div>
-
-          <div class="thumbs" id="thumbStrip" aria-label="Miniaturas de la especie"></div>
         </article>
       </section>
     </main>
