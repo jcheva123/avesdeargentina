@@ -375,21 +375,37 @@ button, input { font: inherit; }
 /* VIEWER */
 .viewer {
   --viewer-scale: 1;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: calc(18px * var(--viewer-scale));
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
-  grid-template-areas:
-    "media info"
-    "media thumbs";
+}
+
+.viewer__info {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--viewer-scale));
+  align-items: flex-start;
+}
+
+.viewer__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(88px, 10vw, 126px);
+  gap: calc(16px * var(--viewer-scale));
   align-items: start;
 }
 
+.viewer__main {
+  display: flex;
+  flex-direction: column;
+  gap: calc(14px * var(--viewer-scale));
+  min-width: 0;
+}
+
 .viewer__media {
-  grid-area: media;
   position: relative;
   overflow: hidden;
   border-radius: calc(var(--radius-xl) - 6px);
-  min-height: clamp(340px, 55vw, 720px);
+  min-height: clamp(340px, 48vw, 700px);
   background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
   border: 1px solid rgba(255,255,255,0.06);
 }
@@ -429,26 +445,10 @@ button, input { font: inherit; }
   font-weight: 600;
 }
 
-.viewer__info {
-  grid-area: info;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: calc(18px * var(--viewer-scale));
-  align-items: stretch;
-}
-
-.viewer__top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: calc(1rem * var(--viewer-scale));
-  flex-wrap: wrap;
-}
-
 .viewer h3 {
+  margin: 0;
   font-family: "Playfair Display", serif;
-  font-size: clamp(calc(1.9rem * var(--viewer-scale)), 4vw, calc(3.35rem * var(--viewer-scale)));
+  font-size: clamp(calc(1.9rem * var(--viewer-scale)), 4vw, calc(3.2rem * var(--viewer-scale)));
   line-height: 0.98;
 }
 
@@ -457,7 +457,6 @@ button, input { font: inherit; }
   flex-direction: column;
   align-items: stretch;
   gap: calc(0.75rem * var(--viewer-scale));
-  min-width: min(100%, 330px);
 }
 
 .viewer__controls {
@@ -465,6 +464,13 @@ button, input { font: inherit; }
   align-items: center;
   gap: calc(0.6rem * var(--viewer-scale));
   flex-wrap: wrap;
+}
+
+.viewer__auxRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: calc(0.75rem * var(--viewer-scale));
 }
 
 .viewer__zoom {
@@ -476,6 +482,7 @@ button, input { font: inherit; }
   border-radius: calc(18px * var(--viewer-scale));
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.04);
+  flex: 0 1 280px;
 }
 
 .viewer__zoomLabelText {
@@ -498,11 +505,17 @@ button, input { font: inherit; }
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
+  align-items: center;
   gap: calc(10px * var(--viewer-scale));
+  flex: 1 1 340px;
+}
+
+.viewer__scientific {
+  margin: 0;
 }
 
 .viewer__notice {
-  margin-top: 0.45rem;
+  margin-top: 0.2rem;
   color: #d9b46b;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -529,19 +542,19 @@ button, input { font: inherit; }
 
 /* THUMBS */
 .thumbs {
-  grid-area: thumbs;
   display: grid;
   grid-template-columns: 1fr;
-  gap: calc(10px * var(--viewer-scale));
+  gap: calc(8px * var(--viewer-scale));
   align-content: start;
-  max-height: clamp(340px, 55vw, 720px);
+  max-height: clamp(340px, 48vw, 700px);
   overflow: auto;
-  padding-right: 4px;
+  padding-right: 2px;
 }
 
 .thumb {
+  width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: calc(16px * var(--viewer-scale));
+  border-radius: calc(14px * var(--viewer-scale));
   overflow: hidden;
   border: 1px solid transparent;
   padding: 0;
@@ -559,7 +572,6 @@ button, input { font: inherit; }
   border-color: rgba(240, 201, 126, 0.55);
   box-shadow: 0 0 0 2px rgba(240, 201, 126, 0.18);
 }
-
 /* SPECIES LIST */
 .species-list {
   display: grid;
@@ -682,19 +694,12 @@ button, input { font: inherit; }
 
 /* RESPONSIVE */
 @media (max-width: 1180px) {
-  .viewer {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "media"
-      "info"
-      "thumbs";
+  .viewer__content {
+    grid-template-columns: minmax(0, 1fr) 110px;
   }
 
   .thumbs {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    max-height: none;
-    overflow: visible;
-    padding-right: 0;
+    max-height: clamp(320px, 46vw, 660px);
   }
 }
 
@@ -810,6 +815,15 @@ button, input { font: inherit; }
     gap: 14px;
   }
 
+  .viewer__content {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .viewer__main {
+    gap: 12px;
+  }
+
   .viewer__media {
     min-height: 280px;
   }
@@ -834,6 +848,7 @@ button, input { font: inherit; }
     grid-auto-flow: column;
     grid-auto-columns: minmax(92px, 120px);
     grid-template-columns: none;
+    max-height: none;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 6px;
