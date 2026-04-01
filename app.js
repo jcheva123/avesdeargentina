@@ -7,6 +7,7 @@ const PLACEHOLDER_MAIN_3 = `${BASE_PATH}/assets/placeholder-main-3.svg`;
 const FAMILY_FALLBACK_THUMB = `${BASE_PATH}/assets/placeholder-main-3.svg`;
 
 const SLIDESHOW_MS = 8000;
+const VIEWER_SCALE_STEPS = [0.92, 1, 1.08, 1.16, 1.24];
 
 const state = {
   data: null,
@@ -18,6 +19,7 @@ const state = {
   slideshowActive: false,
   sidebarCollapsed: false,
   showSpeciesWithoutPhotos: false,
+  viewerScaleIndex: 1,
 };
 
 const els = {
@@ -48,6 +50,10 @@ const els = {
   prevPhotoBtn: document.getElementById('prevPhotoBtn'),
   nextPhotoBtn: document.getElementById('nextPhotoBtn'),
   slideshowBadge: document.getElementById('slideshowBadge'),
+  viewerZoomOutBtn: document.getElementById('viewerZoomOutBtn'),
+  viewerZoomInBtn: document.getElementById('viewerZoomInBtn'),
+  viewerZoomResetBtn: document.getElementById('viewerZoomResetBtn'),
+  viewerZoomLabel: document.getElementById('viewerZoomLabel'),
 };
 
 init();
@@ -67,9 +73,10 @@ async function init() {
     state.filteredFamilies = [...state.data.families];
 
     updateCounters();
-    updateSidebarState();
+    setInitialResponsiveState();
     updateSpeciesFilterButton();
     updateFullscreenButton();
+    applyViewerScale();
     renderFamilies();
     renderCurrentView();
   } catch (error) {
@@ -118,6 +125,18 @@ els.toggleSidebarBtn?.addEventListener('click', toggleSidebar);
     stopSlideshow();
     movePhoto(1);
   });
+
+  els.viewerZoomOutBtn?.addEventListener('click', () => {
+    changeViewerScale(-1);
+  });
+
+  els.viewerZoomInBtn?.addEventListener('click', () => {
+    changeViewerScale(1);
+  });
+
+  els.viewerZoomResetBtn?.addEventListener('click', resetViewerScale);
+
+  window.addEventListener('resize', handleViewportResize, { passive: true });
 }
 
 function normalizeManifest(raw) {
@@ -516,6 +535,8 @@ function renderThumbnails(species) {
     return;
   }
 
+  let activeThumb = null;
+
   (species.displayPhotos || []).forEach((photo, index) => {
     const button = document.createElement('button');
     button.className = `thumb ${index === state.currentPhotoIndex ? 'is-active' : ''}`;
@@ -540,8 +561,19 @@ function renderThumbnails(species) {
       updateSlideshowButtonState(species);
     });
 
+    if (index === state.currentPhotoIndex) activeThumb = button;
     els.thumbStrip.appendChild(button);
   });
+
+  if (activeThumb) {
+    window.requestAnimationFrame(() => {
+      activeThumb.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    });
+  }
 }
 
 function scrollToViewer() {
@@ -713,6 +745,66 @@ function stopSlideshow(refreshButton = true) {
   if (refreshButton) updateSlideshowButtonState(getCurrentSpecies());
 }
 
+function isCompactViewport() {
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+function setInitialResponsiveState() {
+  state.sidebarCollapsed = isCompactViewport();
+  updateSidebarState();
+}
+
+function handleViewportResize() {
+  if (!els.layoutRoot) return;
+
+  if (!isCompactViewport() && els.sidebar) {
+    els.layoutRoot.classList.remove('layout--mobile-sidebar');
+    els.sidebar.classList.remove('sidebar--mobile-open');
+    return;
+  }
+
+  els.layoutRoot.classList.toggle('layout--mobile-sidebar', isCompactViewport());
+  els.sidebar?.classList.toggle('sidebar--mobile-open', isCompactViewport() && !state.sidebarCollapsed);
+}
+
+function getViewerScale() {
+  return VIEWER_SCALE_STEPS[state.viewerScaleIndex] || 1;
+}
+
+function applyViewerScale() {
+  if (!els.viewerCard) return;
+
+  const scale = getViewerScale();
+  const percent = Math.round(scale * 100);
+
+  els.viewerCard.style.setProperty('--viewer-scale', String(scale));
+  if (els.viewerZoomLabel) els.viewerZoomLabel.textContent = `${percent}%`;
+
+  if (els.viewerZoomOutBtn) {
+    els.viewerZoomOutBtn.disabled = state.viewerScaleIndex <= 0;
+  }
+
+  if (els.viewerZoomInBtn) {
+    els.viewerZoomInBtn.disabled = state.viewerScaleIndex >= VIEWER_SCALE_STEPS.length - 1;
+  }
+
+  if (els.viewerZoomResetBtn) {
+    els.viewerZoomResetBtn.disabled = Math.abs(scale - 1) < 0.001;
+  }
+}
+
+function changeViewerScale(step) {
+  const nextIndex = clampIndex(state.viewerScaleIndex + step, VIEWER_SCALE_STEPS.length);
+  if (nextIndex === state.viewerScaleIndex) return;
+  state.viewerScaleIndex = nextIndex;
+  applyViewerScale();
+}
+
+function resetViewerScale() {
+  state.viewerScaleIndex = VIEWER_SCALE_STEPS.indexOf(1);
+  applyViewerScale();
+}
+
 function toggleSidebar() {
   state.sidebarCollapsed = !state.sidebarCollapsed;
   updateSidebarState();
@@ -721,8 +813,13 @@ function toggleSidebar() {
 function updateSidebarState() {
   if (!els.layoutRoot || !els.sidebar) return;
 
-  els.layoutRoot.classList.toggle('layout--sidebar-compact', state.sidebarCollapsed);
-  els.sidebar.classList.toggle('sidebar--compact', state.sidebarCollapsed);
+  const compactViewport = isCompactViewport();
+
+  els.layoutRoot.classList.toggle('layout--sidebar-compact', state.sidebarCollapsed && !compactViewport);
+  els.layoutRoot.classList.toggle('layout--mobile-sidebar', compactViewport);
+
+  els.sidebar.classList.toggle('sidebar--compact', state.sidebarCollapsed && !compactViewport);
+  els.sidebar.classList.toggle('sidebar--mobile-open', compactViewport && !state.sidebarCollapsed);
 
   if (els.toggleSidebarBtn) {
     els.toggleSidebarBtn.textContent = '☰';
