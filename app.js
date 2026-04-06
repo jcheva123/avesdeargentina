@@ -50,6 +50,17 @@ const els = {
   slideshowBadge: document.getElementById('slideshowBadge'),
 };
 
+function formatScientificName(value = '') {
+  const normalized = String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+
+  if (!normalized) return '';
+
+  return normalized.charAt(0).toLocaleUpperCase('es-AR') + normalized.slice(1);
+}
+
 init();
 
 async function init() {
@@ -190,7 +201,7 @@ const displayPhotos = realPhotos;
             ...species,
             order: species.order ?? speciesIndex + 1,
             commonName: resolvedCommonName.toUpperCase(),
-            scientificName: resolvedScientificName.toLowerCase(),
+            scientificName: formatScientificName(resolvedScientificName),
             introImage,
             coverImage,
             photos: displayPhotos,
@@ -218,7 +229,7 @@ const displayPhotos = realPhotos;
         ...family,
         order: family.order ?? parsedFamily.order ?? familyIndex + 1,
         commonName: (family.commonName || parsedFamily.commonName || 'FAMILIA').toUpperCase(),
-        scientificName: family.scientificName || parsedFamily.scientificName || '',
+        scientificName: formatScientificName(family.scientificName || parsedFamily.scientificName || ''),
         species,
         thumbnailUrl,
       };
@@ -312,7 +323,7 @@ function parseSpeciesName(rawName = '') {
     };
   }
 
-  const scientificName = sciMatch[1].toLowerCase();
+  const scientificName = formatScientificName(sciMatch[1]);
   const commonPart = cleaned.slice(0, sciMatch.index).trim();
 
   return {
@@ -414,7 +425,7 @@ function renderFamilies() {
 
     num.textContent = family.order;
     strong.textContent = family.commonName;
-    small.textContent = family.scientificName;
+    small.textContent = formatScientificName(family.scientificName);
 
     const manualThumb = `${BASE_PATH}/assets/familias/${family.order}.jpg`;
     const autoThumb = family.thumbnailUrl || FAMILY_FALLBACK_THUMB;
@@ -454,9 +465,9 @@ function renderCurrentView() {
   }
 
   if (els.currentFamilyCommon) els.currentFamilyCommon.textContent = family.commonName;
-  if (els.currentFamilyScientific) els.currentFamilyScientific.textContent = family.scientificName;
+  if (els.currentFamilyScientific) els.currentFamilyScientific.textContent = formatScientificName(family.scientificName);
   if (els.currentSpeciesCommon) els.currentSpeciesCommon.textContent = species.commonName;
-  if (els.currentSpeciesScientific) els.currentSpeciesScientific.textContent = species.scientificName;
+  if (els.currentSpeciesScientific) els.currentSpeciesScientific.textContent = formatScientificName(species.scientificName);
   if (els.speciesOrderBadge) els.speciesOrderBadge.textContent = `Especie ${species.order}`;
   if (els.familyOrderBadge) els.familyOrderBadge.textContent = `Familia ${family.order}`;
 
@@ -588,7 +599,7 @@ function renderSpeciesCards(family) {
 
     node.querySelector('.species-card__order').textContent = `N° ${species.order}`;
     node.querySelector('strong').textContent = species.commonName;
-    node.querySelector('small').textContent = species.scientificName;
+    node.querySelector('small').textContent = formatScientificName(species.scientificName);
 
     const preview = node.querySelector('.species-card__preview');
     preview.innerHTML = '';
