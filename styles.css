@@ -332,6 +332,13 @@ button, input { font: inherit; }
   color: var(--muted);
 }
 
+.family-item small,
+.species-card small,
+.toolbar__scientific,
+.viewer__scientific {
+  font-style: italic;
+}
+
 .family-item__labels strong,
 .species-card strong {
   display: block;
