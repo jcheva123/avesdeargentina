@@ -119,7 +119,42 @@
       font-size: 0.92rem;
       line-height: 1.5;
     }
+.info-card--guide {
+  align-items: start;
+}
 
+.info-card--guide .info-card__content {
+  align-self: start;
+}
+
+.info-card__figure {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.info-card--guide .info-card__media {
+  width: min(100%, 340px);
+  max-height: 260px;
+}
+
+.info-card--guide .info-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 900px) {
+  .info-card__figure {
+    justify-content: stretch;
+  }
+
+  .info-card--guide .info-card__media {
+    width: 100%;
+    max-height: none;
+  }
+}
     @media (max-width: 900px) {
       .info-card,
       .info-card--reverse {
@@ -179,7 +214,7 @@
           </div>
         </section>
 
-       <section class="info-card info-card--reverse card">
+<section class="info-card info-card--reverse info-card--guide card">
   <div class="info-card__content">
     <h2>La guía que acompañó décadas de registro</h2>
 
@@ -195,7 +230,7 @@
     </p>
   </div>
 
-  <div>
+  <div class="info-card__figure">
     <div class="info-card__media">
       <img src="assets/guia2.jpg" alt="Primer ejemplar de la Guía para la identificación de las aves de Argentina y Uruguay" />
     </div>
