@@ -33,12 +33,21 @@
       line-height: 1.02;
     }
 
+    .info-stack {
+      display: grid;
+      gap: 20px;
+    }
+
     .info-card {
       padding: 22px;
       display: grid;
       grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
       gap: 24px;
       align-items: center;
+    }
+
+    .info-card--reverse {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
     }
 
     .info-card__media {
@@ -69,6 +78,16 @@
       font-size: 1rem;
     }
 
+    .info-highlight {
+      margin: 14px 0 18px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #e7eef7;
+      line-height: 1.7;
+    }
+
     .info-contact {
       margin-top: 18px;
       display: flex;
@@ -94,8 +113,16 @@
       line-height: 1.6;
     }
 
+    .info-caption {
+      margin: 10px 4px 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
     @media (max-width: 900px) {
-      .info-card {
+      .info-card,
+      .info-card--reverse {
         grid-template-columns: 1fr;
       }
     }
@@ -113,43 +140,77 @@
         <a class="btn btn--soft" href="index.html">← Volver al inicio</a>
       </div>
 
-      <section class="info-card card">
-        <div class="info-card__media">
-          <img src="assets/Martayhector.JPG" alt="Héctor Chevalier y Marta S. García" />
-        </div>
-
-        <div class="info-card__content">
-          <h2>Una vida de observación, viajes y naturaleza</h2>
-
-          <p>
-            Esta recopilación fotográfica ha sido realizada con mucho empeño, dedicación y amor por la naturaleza
-            por <strong>Héctor Chevalier</strong> y <strong>Marta S. García</strong>.
-          </p>
-
-          <p>
-            Desde <strong>Bahía Blanca</strong>, recorriendo en su extensión la República Argentina, fueron construyendo esta colección con una mirada paciente, sensible y profundamente
-            respetuosa del entorno natural.
-          </p>
-
-          <p>
-            Este trabajo detallado y minucioso es el resultado de <strong>más de 30 años</strong> de observación,
-            registro, viajes y organización. Representa no solo un valioso archivo fotográfico, sino también una
-            forma de amor por las aves, los paisajes y la biodiversidad de nuestro país.
-          </p>
-
-          <div class="info-contact">
-            <span class="pill pill--muted">Contacto</span>
-            <a class="info-contact__mail" href="mailto:marta.chevalier@hotmail.com">
-              marta.chevalier@hotmail.com
-            </a>
+      <div class="info-stack">
+        <section class="info-card card">
+          <div class="info-card__media">
+            <img src="assets/Martayhector.JPG" alt="Héctor Chevalier y Marta S. García" />
           </div>
 
-          <p class="info-footnote">
-            Esta biblioteca visual busca dar forma y difusión a ese enorme trabajo de recopilación, para que pueda
-            ser apreciado y recorrido de manera clara, ordenada y accesible.
-          </p>
-        </div>
-      </section>
+          <div class="info-card__content">
+            <h2>Una vida de observación, viajes y naturaleza</h2>
+
+            <p>
+              Esta recopilación fotográfica ha sido realizada con mucho empeño, dedicación y amor por la naturaleza
+              por <strong>Héctor Chevalier</strong> y <strong>Marta S. García</strong>.
+            </p>
+
+            <p>
+              Desde <strong>Bahía Blanca</strong>, recorriendo en su extensión la República Argentina, fueron construyendo esta colección con una mirada paciente, sensible y profundamente
+              respetuosa del entorno natural.
+            </p>
+
+            <p>
+              Este trabajo detallado y minucioso es el resultado de <strong>más de 30 años</strong> de observación,
+              registro, viajes y organización. Representa no solo un valioso archivo fotográfico, sino también una
+              forma de amor por las aves, los paisajes y la biodiversidad de nuestro país.
+            </p>
+
+            <div class="info-contact">
+              <span class="pill pill--muted">Contacto</span>
+              <a class="info-contact__mail" href="mailto:marta.chevalier@hotmail.com">
+                marta.chevalier@hotmail.com
+              </a>
+            </div>
+
+            <p class="info-footnote">
+              Esta biblioteca visual busca dar forma y difusión a ese enorme trabajo de recopilación, para que pueda
+              ser apreciado y recorrido de manera clara, ordenada y accesible.
+            </p>
+          </div>
+        </section>
+
+        <section class="info-card info-card--reverse card">
+          <div class="info-card__content">
+            <h2>La guía que acompañó décadas de registro</h2>
+
+            <p>
+              A lo largo de estos años, una referencia central para ordenar, identificar y seguir el registro de especies
+              fue el libro <strong>Guía para la identificación de las aves de Argentina y Uruguay</strong>, también conocido como
+              <strong>Aves de Argentina y Uruguay – Guía de Identificación</strong> de <strong>Narosky &amp; Yzurieta</strong>.
+            </p>
+
+            <div class="info-highlight">
+              Es una guía de campo profundamente práctica, clara y útil, convertida con el paso del tiempo en una obra de consulta
+              fundamental tanto para aficionados que se inician como para observadores experimentados y ornitólogos.
+            </div>
+
+            <p>
+              En esta colección, la guía fue una referencia constante y un apoyo fundamental para sostener con criterio y continuidad
+              todos estos años de registro fotográfico. También es parte fundamental de cada salida de campo y de cada archivo ordenado con paciencia a lo largo del tiempo.
+            </p>
+
+          </div>
+
+          <div>
+            <div class="info-card__media">
+              <img src="guia.jpg" alt="Ejemplar de la Guía para la identificación de las aves de Argentina y Uruguay" />
+            </div>
+            <p class="info-caption">
+              Ejemplar de campo de la guía, compañero de consulta durante años de observación, viajes y registro fotográfico.
+            </p>
+          </div>
+        </section>
+      </div>
     </main>
   </div>
 </body>
